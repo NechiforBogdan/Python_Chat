@@ -1,29 +1,47 @@
 import socket
+import threading
 
 PORT = 585
 FORMAT = 'utf-8'
-HEADER = 64
-DISCONNECTED = "DISCONNECTED"
-SERVER = "192.168.1.23"
-ADDR = (SERVER,PORT)
+HEADER = 1024
+SERVER = "192.168.178.20"
+ADDR = (SERVER, PORT)
+
+username = input("Choose a username:")
+print(f"Hello {username} welcome to the chat, if you want to quit this chat just type EXIT")
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
-def sendMessage(msg):
-    message = msg.encode(FORMAT)    # Encodes the message (str) into BYTES format to send it to socket
-    msg_length = len(message)
-    send_length = str(msg_length).encode(FORMAT)
-    send_length += b' ' * (HEADER - len(send_length)) # Cuz we need to make the message 64 bytes (header) we need to take the actual message length and substract it from the HEADER (64bytes) 
-    #After subtracting the length of the message from the length of the header, we need to padd it: to make it 64 byes (b" "  = bytes "space" = adds emptry strings (spaces) to make the msg 64bytes)
-    client.send(send_length)
-    client.send(message)
-    print(client.recv(2048).decode(FORMAT))
+
+def getMessage():
+    while True:
+        try:
+            message = client.recv(HEADER).decode(FORMAT)
+            if message == "USER":
+                client.send(username.encode(FORMAT))
+            else:
+                if username == (message.split(">")[0]):
+                    pass
+                else:
+                    print(message)
+        except:
+            print("Closing connection!\n")
+            client.close()
+            break
 
 
+def sendMessage():
+    while True:
+        inp = input()
+        message = f"{username}>{inp}"
+        client.send(message.encode(FORMAT))
+        if inp == "EXIT":
+            client.close()
+            quit()
 
-sendMessage("Surprise")
-input()
-sendMessage("mother fucker!")
 
-sendMessage(DISCONNECTED)
+receivingTHREAD = threading.Thread(target=getMessage)
+sendingTHREAD = threading.Thread(target=sendMessage)
+receivingTHREAD.start()
+sendingTHREAD.start()
