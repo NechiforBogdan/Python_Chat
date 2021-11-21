@@ -31,11 +31,22 @@ print(f"Server listening on : {SERVER}")
 
 
 def broadcast(message):
+"""
+    this function send a variable (message) to users 
+
+    :print: str: the message
+"""
     for client in users:
         client.send(message)
 
 
 def handling(client):
+"""
+    this function stop the server if a user write EXIT
+    
+    :return: 0
+    :print: str: an error's message
+"""
     connected = True
     while connected:
         try:
@@ -75,6 +86,14 @@ def handling(client):
 
 
 def start():
+"""
+    this function start a server and let clients go on the server
+    
+    :print: str: client's adress ip and his username
+    :print: str: broadcast to all clients that a client has connected
+    :print: str: Number of active clients
+    :print: str: server is starting...
+"""
     while True:
         client, address = server.accept()  # accepts all clients onto the server
         # client =  <socket.socket fd=1244, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=
