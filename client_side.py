@@ -15,6 +15,13 @@ client.connect(ADDR)
 
 
 def getMessage():
+    """
+    this function get back the encoded message to treat it with different criteria
+
+    :print: str: the encoded message
+    :return: the name of user
+    :print: str: a message for closing connection
+    """
     while True:
         try:
             message = client.recv(HEADER).decode(FORMAT)
@@ -32,6 +39,11 @@ def getMessage():
 
 
 def sendMessage():
+    """
+    takes what has been encoded and creates a new message to display in the conversation
+
+    :return: str: the message encoded
+    """
     while True:
         inp = input()
         message = f"{username}>{inp}"
