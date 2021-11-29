@@ -51,19 +51,6 @@ def handling(client):
     while connected:
         try:
             message = client.recv(HEADER)
-            if message.decode(FORMAT).split(">")[1] == "EXIT":
-                message_disconnected = f"user {message.decode(FORMAT).split('>')[0]} has disconnected."
-                broadcast(message_disconnected.encode(FORMAT))
-                index = 0
-                for i in range(0, len(users)):
-                    if users[i] == client:
-                        index = i
-                        users.remove(users[i])
-                username = usernames[index]
-                usernames.remove(username)
-                print(f"User '{username}' has disconnected!")
-                connected = False
-                break
             broadcast(message)
         except:
             if connected:
