@@ -2,6 +2,9 @@ import socket
 import threading
 
 """
+'mongodb+srv://gabone:<password>@cluster0.kz9xy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+
+    qZYh333AoByIQEjU
     Gets IP by host name <socket.gethostbyname>
     Sets port number (choice)
     Puts IP & PORT in tuple for binding
@@ -10,11 +13,10 @@ import threading
         socket() takes 2 param : 
             @AF_IN : Internet Adress family ( AF_INET = IPv4 )
             @SOCK_STREAM : Specifies type of socket ( SOCK_STREAM = TCP  // SOCK_DGRAM = UDP )
-
 """
 HEADER = 1024
 PORT = 585
-SERVER = "10.4.37.148"  # Gets YOUR IP address (u can type it manually if you want)
+SERVER = "10.99.1.154"  # Gets YOUR IP address (u can type it manually if you want)
 ADDR = (SERVER, PORT)
 FORMAT = "utf-8"
 
@@ -31,34 +33,42 @@ print(f"Server listening on : {SERVER}")
 
 
 def broadcast(message):
-"""
+    """
     this function send a variable (message) to users 
 
     :print: str: the message
-"""
+    """
     for client in users:
         client.send(message)
 
 
 def handling(client):
-"""
+    """
     this function stop the server if a user write EXIT
     
     :return: 0
     :print: str: an error's message
-"""
+    """
     connected = True
     while connected:
         try:
             message = client.recv(HEADER)
-            broadcast(message)
-        except:
-            if connected:
-                print("An error has occurred!")
-                break
-            else:
+            if message.decode(FORMAT).split(">")[1][0] == "!":
                 pass
-                break
+            else:
+                broadcast(message)
+        except ConnectionResetError or ConnectionAbortedError or ConnectionError or ConnectionRefusedError:
+            index = 0
+            for i in range(0, len(users)):
+                if users[i] == client:
+                    index = i
+                    users.remove(users[i])
+            username = usernames[index]
+            usernames.remove(username)
+            message = f"User '{username}' has disconnected!".encode(FORMAT)
+            broadcast(message)
+            print(message)
+            connected = False
     client.close()
     return 0
 
@@ -73,14 +83,14 @@ def handling(client):
 
 
 def start():
-"""
+    """
     this function start a server and let clients go on the server
     
     :print: str: client's adress ip and his username
     :print: str: broadcast to all clients that a client has connected
     :print: str: Number of active clients
     :print: str: server is starting...
-"""
+    """
     while True:
         client, address = server.accept()  # accepts all clients onto the server
         # client =  <socket.socket fd=1244, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=
