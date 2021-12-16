@@ -8,3 +8,4 @@ database = client["Chat1"]
 users_collection = database["Users"]
 messages_collection = database["msg"]
 rooms_collection = database["room"]
+
